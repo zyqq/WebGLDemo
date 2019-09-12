@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>画一个点</title>
+    <title>通过变量控制一个点</title>
   </head>
   <body onload="main()">
     <canvas id="webgl" width="640" height="480">
@@ -13,15 +13,17 @@
     </canvas>
   </body>
 </html>
-<script src="./lib/webgl-utils.js"></script>
-<script src="./lib/webgl-debug.js"></script>
-<script src="./lib/cuon-utils.js"></script>
+<script src="../lib/webgl-utils.js"></script>
+<script src="../lib/webgl-debug.js"></script>
+<script src="../lib/cuon-utils.js"></script>
 <script>
   // 顶点着色器
   const VSHADER_SOURCE = `
+    attribute vec4 a_Position;
+    attribute float a_PointSize;
     void main() {
-      gl_Position = vec4(0.0, 0.0, 0.0, 1.0); // 设置坐标
-      gl_PointSize = 10.0; // 设置尺寸
+      gl_Position = a_Position; // 设置坐标
+      gl_PointSize = a_PointSize; // 设置尺寸
     }
   `
   // 片段着色器
@@ -46,6 +48,20 @@
       console.log('Failed to initialize shaders.')
       return
     }
+
+    // 获取attribute 变量的存储位置
+    let a_Position = gl.getAttribLocation(gl.program, 'a_Position')
+    if (a_Position < 0) {
+      console.log('Failed to get the storage location of a_Position')
+      return
+    }
+    // 获取大小
+    let a_PointSize = gl.getAttribLocation(gl.program, 'a_PointSize')
+
+    // 将顶点位置传输给 attribute 变量
+    gl.vertexAttrib3f(a_Position, 0.0, 0.0, 0.0)
+    // 将顶点大小传输给 attribute 变量
+    gl.vertexAttrib1f(a_PointSize, 5.0)
 
     // 将清除色设为黑色
     gl.clearColor(0.0, 0.0, 0.0, 1.0)
